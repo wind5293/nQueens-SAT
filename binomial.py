@@ -1,3 +1,5 @@
+from pysat.solvers import Glucose3
+
 def generate_variables(n):
     variables = [[] for _ in range(n)]
     for i in range(n):
@@ -35,8 +37,32 @@ def generate_clauses(n, variables):
                 if i + k < n and j - k >= 0:
                     at_most_one(clauses, [variables[i][j], variables[i + k][j - k]])
     return clauses
+         
+def solve_n_queens(n):
+    variables = generate_variables(n)
+    clauses = generate_clauses(n, variables)
+    print(clauses)
+
+    solver = Glucose3()
+    for clause in clauses:
+        solver.add_clause(clause)
+
+    if solver.solve():
+        model = solver.get_model()
+        return [[int(model[i * n + j] > 0) for j in range(n)] for i in range(n)]
+    else:
+        return None
             
-n = 3
-variables = generate_variables(n)
-clauses = generate_clauses(n, variables)
-print(clauses)
+def print_solution(solution):
+    if solution is None:
+        print("No solution found.")
+    else:
+        print(solution)
+        for row in solution:
+            print(" ".join("Q" if cell else "." for cell in row))
+
+
+n = 8
+# print(generate_clauses(n, generate_variables(n)))
+solution = solve_n_queens(n)
+print_solution(solution)
